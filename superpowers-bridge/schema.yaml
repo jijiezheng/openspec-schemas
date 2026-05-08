@@ -284,7 +284,7 @@ artifacts:
     requires:
       - plan
 
-- id: retrospective
+  - id: retrospective
     generates: retrospective.md
     description: 已完成变更的证据优先回顾
     template: retrospective.md
