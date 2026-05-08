@@ -1,39 +1,39 @@
-## Design Summary
+## 设计概要
 
-<!-- Validated design from brainstorming session -->
+<!-- 头脑风暴会话验证后的设计 -->
 
-## Alternatives Considered
+## 考虑的替代方案
 
 <!--
-依 openspec/config.yaml 的 brainstorm rule：須涵蓋 2-3 個替代方案並說明取捨。
+按 openspec/config.yaml 的 brainstorm rule：需涵盖 2-3 个替代方案并说明取舍。
 
-### 方案 A：<名稱>
+### 方案 A：<名称>
 - **做法**：<一段描述>
-- **優點**：<列點>
-- **缺點**：<列點>
-- **為何未採用**：<與 Agreed Approach 的差距>
+- **优点**：<列点>
+- **缺点**：<列点>
+- **为何未采用**：<与 Agreed Approach 的差距>
 
-### 方案 B：<名稱>
+### 方案 B：<名称>
 - **做法**：
-- **優點**：
-- **缺點**：
-- **為何未採用**：
+- **优点**：
+- **缺点**：
+- **为何未采用**：
 
-### 方案 C：<名稱>（可選）
+### 方案 C：<名称>（可选）
 - **做法**：
-- **優點**：
-- **缺點**：
-- **為何未採用**：
+- **优点**：
+- **缺点**：
+- **为何未采用**：
 -->
 
-## Agreed Approach
+## 约定的方案
 
-<!-- The chosen approach and rationale — 引用上方其中一個方案並說明為何勝出 -->
+<!-- 所选方案及其理由——引用上方其中一个方案并说明为何胜出 -->
 
-## Key Decisions
+## 关键决策
 
-<!-- Decisions made during brainstorming -->
+<!-- 头脑风暴期间做出的决策 -->
 
-## Open Questions
+## 待解决问题
 
-<!-- Any remaining questions to resolve -->
+<!-- 仍需解决的任何问题 -->

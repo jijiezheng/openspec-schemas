@@ -1,17 +1,17 @@
-# [Feature Name] Implementation Plan
+# [功能名称] 实现计划
 
-> **For agentic workers:** Use superpowers:subagent-driven-development
-> to implement this plan task-by-task.
+> **给 agent 工作者：** 使用 superpowers:subagent-driven-development
+> 按任务逐步实现本计划。
 
-**Goal:** <!-- One sentence -->
+**目标：** <!-- 一句话 -->
 
-**Architecture:** <!-- 2-3 sentences -->
+**架构：** <!-- 2-3 句 -->
 
-**Tech Stack:** <!-- Key technologies -->
+**技术栈：** <!-- 关键技术 -->
 
 ---
 
-## Task 1: <!-- Component Name -->
+## 任务 1：<!-- 组件名称 -->
 
-- [ ] **Step 1:** <!-- micro-step -->
-- [ ] **Step 2:** <!-- micro-step -->
+- [ ] **步骤 1：** <!-- 微观步骤 -->
+- [ ] **步骤 2：** <!-- 微观步骤 -->
