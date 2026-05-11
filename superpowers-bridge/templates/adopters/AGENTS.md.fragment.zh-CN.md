@@ -10,8 +10,8 @@
 
 | 观察到的触发词 | 应对方式 |
 |---|---|
-| 用户开始"设计讨论 / 头脑风暴" | 运行口头的 `superpowers:brainstorming`，但**不要**写入 `docs/superpowers/specs/`。当对话符合以下 5 条标准时，提升为 `/opsx:propose` |
-| 用户直接调用 `/opsx:new` / `/opsx:ff` / `/opsx:propose` | 遵循 schema 流程；各步骤的制品说明会自动注入 |
+| 用户开始"设计讨论 / 头脑风暴" | 运行口头的 `superpowers:brainstorming`，但**不要**写入 `docs/superpowers/specs/`。当对话符合以下 5 条标准时，提升为 `/opsx-propose` |
+| 用户直接调用 `/opsx-propose` | 遵循 schema 流程；各步骤的制品说明会自动注入 |
 | 用户明确说是 bug 修复 / 笔误 / 配置调整 / 文档更新 | 直接 PR——**不要**发起 change（见下方跳过规则） |
 | 用户处于变更中途 | 用 `/opsx:continue`、`/opsx:apply`、`/opsx:verify` 或 `/opsx:archive` 推进 |
 
@@ -34,7 +34,7 @@
 4. **验收条件可陈述**——具体通过条件（如 `./mvnw clean verify` 通过 + N 项交付物）
 5. **对话正在收敛**——最近几轮是确认而非新的"那如果...呢"
 
-5 条全部满足时 → 主动提议"可以进入 `/opsx:propose` 了？"——等待用户确认，绝不自动触发。
+5 条全部满足时 → 主动提议"可以进入 `/opsx-propose` 了？"——等待用户确认，绝不自动触发。
 
 ### 前门反模式（不要这样做）
 

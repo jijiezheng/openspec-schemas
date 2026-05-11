@@ -2,20 +2,13 @@ name: superpowers-bridge
 version: 1
 description: >
   与 Superpowers skills 集成的 Spec-driven 工作流。
-  前提条件：已安装 Superpowers 插件，提供以下 skills：
-  brainstorming、writing-plans、using-git-worktrees、
-  subagent-driven-development、finishing-a-development-branch。
-  需要支持 subagent 的平台（Claude Code、Codex 等）——
-  本 schema 不支持无 subagent 支持的运行时，
-  因为替代执行器（executing-plans）会丢失 TDD 和
-  code-review 的传递激活，使 Superpowers 的价值失效。
+  前提条件：已安装 Superpowers 插件，提供以下 skills：brainstorming、writing-plans、using-git-worktrees、subagent-driven-development、finishing-a-development-branch。
+  需要支持 subagent 的平台（Claude Code、Codex 等）—— 本 schema 不支持无 subagent 支持的运行时，因为替代执行器（executing-plans）会丢失 TDD 和 code-review 的传递激活，使 Superpowers 的价值失效。
   若平台不支持 subagent，请使用 spec-driven。
-  每个 artifact / apply 步骤在使用前验证其必需的 skills，
-  若有缺失则显示明确错误。
+  每个 artifact / apply 步骤在使用前验证其必需的 skills，若有缺失则显示明确错误。
   流程：brainstorm → proposal → specs → tasks → plan → verify → retrospective。
   design 为可选（从 brainstorm 产出，但 tasks 不依赖它）。
-  Apply 阶段使用 git worktrees + subagent-driven-development
-  （传递带来 TDD 和 code-review）。
+  Apply 阶段使用 git worktrees + subagent-driven-development（传递带来 TDD 和 code-review）。
 
 artifacts:
   - id: brainstorm
@@ -24,21 +17,17 @@ artifacts:
     template: brainstorm.md
     instruction: |
       PRECHECK — 所需 skill 可用性：
-      调用前，确认 `superpowers:brainstorming` 出现在
-      你的可用 skills 列表中。若缺失，STOP 并告知用户
-      必须安装 Superpowers 插件（或可明确选择使用下方模板
-      手动编写 brainstorm.md）。不可静默降级。
+      调用前，确认 `superpowers:brainstorming` 出现在你的可用 skills 列表中。
+      若缺失，STOP 并告知用户必须安装 Superpowers 插件（或可明确选择使用下方模板手动编写 brainstorm.md）。
+      不可静默降级。
 
       使用 Skill 工具调用 **superpowers:brainstorming**。
 
       重要输出重定向：
-      - 不可写入 `docs/superpowers/specs/`。而是将
-        brainstorming 设计输出直接写入本 change 的 `brainstorm.md`。
-      - 若 brainstorming 产出了 design document，也写入
-        本 change 的 `design.md`（这将预填充 design artifact）。
+      - 不可写入 `docs/superpowers/specs/`。而是将 brainstorming 设计输出直接写入本 change 的 `brainstorm.md`。
+      - 若 brainstorming 产出了 design document，也写入本 change 的 `design.md`（这将预填充 design artifact）。
 
-      brainstorming 完成后，使用模板结构在
-      brainstorm.md 中总结已达成一致的设计。
+      brainstorming 完成后，使用模板结构在 brainstorm.md 中总结已达成一致的设计。
 
       brainstorming skill 会：
       1. 探索项目上下文
@@ -63,12 +52,9 @@ artifacts:
         - **Modified Capabilities**：列出其 REQUIREMENTS 正在变更的既有 capabilities。检查 `openspec/specs/` 获取现有 spec 名称。
       - **Impact**：受影响的代码、API、依赖或系统。
 
-      由于 brainstorming 已探索了问题空间，
-      这里应是简洁提取，而非新探索。
+      由于 brainstorming 已探索了问题空间，这里应是简洁提取，而非新探索。
 
-      重要：Capabilities 部分是关键。它建立了
-      proposal 和 specs 阶段之间的契约。这里列出的
-      每个 capability 都需要一个 spec 文件。
+      重要：Capabilities 部分是关键。它建立了 proposal 和 specs 阶段之间的契约。这里列出的每个 capability 都需要一个 spec 文件。
 
       保持简洁（1-2 页）。聚焦"why"而非"how"。
     requires:
@@ -82,11 +68,8 @@ artifacts:
       创建说明如何实现本变更的设计文档。
 
       检查 brainstorming 是否已产出 design.md 文件。
-      若 design.md 已存在且含 brainstorming 内容，
-      则审查并完善，而非从头创建。
-
-      若 design.md 为空或不存在，从
-      brainstorm.md 输出创建。
+      若 design.md 已存在且含 brainstorming 内容，则审查并完善，而非从头创建。
+      若 design.md 为空或不存在，从 brainstorm.md 输出创建。
 
       章节：
       - **Context**：背景、现状、约束、利益相关方
@@ -96,8 +79,7 @@ artifacts:
       - **Migration Plan**：部署步骤、回滚策略（如适用）
       - **Open Questions**：待解决的悬而未决的决策或未知
 
-      聚焦架构和方法，而非逐行实现。
-      好的 design doc 解释技术决策背后的"why"。
+      聚焦架构和方法，而非逐行实现。好的 design doc 解释技术决策背后的"why"。
     requires:
       - brainstorm
 
@@ -136,8 +118,7 @@ artifacts:
     instruction: |
       创建分解实现工作的任务列表。
 
-      **重要：严格遵循下方模板。** apply 阶段解析
-      复选框格式以跟踪进度。不使用 `- [ ]` 的任务不会被追踪。
+      **重要：严格遵循下方模板。** apply 阶段解析复选框格式以跟踪进度。不使用 `- [ ]` 的任务不会被追踪。
 
       指南：
       - 将相关任务分组在 ## 编号标题下
@@ -145,10 +126,7 @@ artifacts:
       - 任务应小到可以在一个会话中完成
       - 按依赖排序（什么必须先做？）
 
-      参考 specs 了解需要构建什么。若存在 design.md，
-      参考它了解如何构建 — 但 design 是可选的（见
-      openspec-conventions：design.md 仅用于需要
-      解释非平凡技术决策的变更）。
+      参考 specs 了解需要构建什么。若存在 design.md，参考它了解如何构建 — 但 design 是可选的（见 openspec-conventions：design.md 仅用于需要解释非平凡技术决策的变更）。
     requires:
       - specs
 
@@ -158,16 +136,14 @@ artifacts:
     template: plan.md
     instruction: |
       PRECHECK — 所需 skill 可用性：
-      调用前，确认 `superpowers:writing-plans` 出现在
-      你的可用 skills 列表中。若缺失，STOP 并告知用户
-      必须安装 Superpowers 插件（或可明确选择使用下方模板
-      手动编写 plan.md）。不可静默降级。
+      调用前，确认 `superpowers:writing-plans` 出现在你的可用 skills 列表中。
+      若缺失，STOP 并告知用户必须安装 Superpowers 插件（或可明确选择使用下方模板手动编写 plan.md）。
+      不可静默降级。
 
       使用 Skill 工具调用 **superpowers:writing-plans**。
 
       重要输出重定向：
-      - 不可写入 `docs/superpowers/plans/`。而是将
-        计划直接写入本 change 的 `plan.md`。
+      - 不可写入 `docs/superpowers/plans/`。而是将计划直接写入本 change 的 `plan.md`。
 
       writing-plans skill 会：
       1. 阅读 tasks.md 和 design.md 获取上下文
@@ -175,9 +151,7 @@ artifacts:
       3. 包含精确的文件路径、代码片段、测试命令
       4. 每个任务后添加 commit 点
 
-      将 tasks.md 内容传递给 skill 作为
-      分解的输入。计划应引用本 change 目录中的
-      specs 和 design artifacts。
+      将 tasks.md 内容传递给 skill 作为分解的输入。计划应引用本 change 目录中的 specs 和 design artifacts。
     requires:
       - tasks
 
@@ -187,9 +161,7 @@ artifacts:
     template: verify.md
     instruction: |
       PRECHECK — 实现证据：
-      产出 verify.md 前，运行以下两个命令。若任一
-      返回 0，STOP 并告知用户 apply 阶段尚未
-      产出可供审查的变更。
+      产出 verify.md 前，运行以下两个命令。若任一返回 0，STOP 并告知用户 apply 阶段尚未产出可供审查的变更。
 
       1. Commit 证据（必须返回 > 0）：
          git log --oneline $(git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD origin/master 2>/dev/null)..HEAD | wc -l
@@ -197,90 +169,41 @@ artifacts:
       2. 任务进度（必须返回 > 0）：
          grep -c '^- \[x\]' openspec/changes/<change-name>/tasks.md
 
-      仅当两个都返回正数后，才可调用
-      下方的验证 skill。
-
-      使用 Skill 工具调用 **openspec-verify-change**（其
-      用户-facing 等效命令是 `/opsx:verify`）。
+      仅当两个都返回正数后，才可调用下方的验证 skill。
+      使用 Skill 工具调用 **openspec-verify-change**（其用户-facing 等效命令是 `/opsx:verify`）。
 
       重要时序说明：
-      - 与其他 artifacts 不同，verify.md 在 apply
-        阶段完成后产出，而非规划期间。`requires: [plan]`
-        边仅用于 schema 图目的 — 实际
-        验证步骤必须在已完成的实现上运行。
+      - 与其他 artifacts 不同，verify.md 在 apply 阶段完成后产出，而非规划期间。`requires: [plan]` 边仅用于 schema 图目的 — 实际验证步骤必须在已完成的实现上运行。
 
-      verify 步骤必须执行以下检查并将结果
-      记录在 verify.md（使用模板）：
+      verify 步骤必须执行以下检查并将结果记录在 verify.md（使用模板）：
 
-      1. **结构验证**：在冷指令根运行 `openspec validate --all --json`，
-         确认每个 item 返回 `"valid": true`。若有 item 失败，
-         记录问题并返回修复底层 artifact 后再继续。
+      1. **结构验证**：在冷指令根运行 `openspec validate --all --json`，确认每个 item 返回 `"valid": true`。若有 item 失败，记录问题并返回修复底层 artifact 后再继续。
 
-      2. **任务完成**：确认 tasks.md 中每个复选框为
-         `- [x]`。对任何仍为 `- [ ]` 的项目，记录原因
-         （如 manual / out-of-scope / blocked）及其是否阻塞
-         archive。
+      2. **任务完成**：确认 tasks.md 中每个复选框为 `- [x]`。对任何仍为 `- [ ]` 的项目，记录原因（如 manual / out-of-scope / blocked）及其是否阻塞 archive。
 
-      3. **Delta spec 同步状态**：对 `openspec/changes/<name>/specs/`
-         下的每个目录，与对应的 `openspec/specs/<capability>/spec.md`
-         比较并记录其一：
+      3. **Delta spec 同步状态**：对 `openspec/changes/<name>/specs/` 下的每个目录，与对应的 `openspec/specs/<capability>/spec.md` 比较并记录其一：
          - ✓ 已同步
          - ✗ 需要同步（列出 capabilities）
          - N/A（未产出 delta specs）
 
-      4. **Design/specs 一致性**：抽查 design.md
-         决策是否引用或对齐 specs/ 中的 requirements。
-         记录任何漂移作为警告（非阻塞）。
+      4. **Design/specs 一致性**：抽查 design.md 决策是否引用或对齐 specs/ 中的 requirements。记录任何漂移作为警告（非阻塞）。
 
-      5. **实现信号**：确认所有代码变更已提交
-         （工作目录中无非 staged 文件）。若知道则引用
-         commit 范围。
+      5. **实现信号**：确认所有代码变更已提交（工作目录中无非 staged 文件）。若知道则引用 commit 范围。
 
       6. **前门路由泄露检测**（警告，非阻塞）：
-
-         对使用 superpowers-bridge 的项目，设计产出
-         不应落在 `docs/superpowers/specs/` — brainstorm artifact 的
-         输出重定向（见本 schema 的 brainstorm.instruction）
-         将其路由到 `openspec/changes/<name>/brainstorm.md`。运行：
-
+         对使用 superpowers-bridge 的项目，设计产出不应落在 `docs/superpowers/specs/` — brainstorm artifact 的输出重定向（见本 schema 的 brainstorm.instruction）将其路由到 `openspec/changes/<name>/brainstorm.md`。运行：
            ls docs/superpowers/specs/*.md 2>/dev/null
-
-         若存在任何文件，记录 WARNING：「前门路由
-         泄露 — 设计产出发现于 docs/superpowers/specs/...；
-         它们应位于 openspec/changes/<name>/brainstorm.md 或
-         design.md。移动/删除后确认内容已捕获到
-         change 目录中」。
-
-         非阻塞 — 采用者可能在 schema 安装前对该目录
-         有合法的非 schema 使用。呈现泄露以便
-         用户决定是否清理。
+         若存在任何文件，记录 WARNING：「前门路由泄露 — 设计产出发现于 docs/superpowers/specs/...；它们应位于 openspec/changes/<name>/brainstorm.md 或 design.md。移动/删除后确认内容已捕获到 change 目录中」。
+         非阻塞 — 采用者可能在 schema 安装前对该目录有合法的非 schema 使用。呈现泄露以便用户决定是否清理。
 
       7. **推迟的 dogfood 与自动化测试等价性**：
+         若 plan.md 有任何标记 `[~]` 推迟的任务（手动 smoke / dogfood / 现场环境检查在本 cycle 中未运行），在 verify.md §7 中逐项枚举并识别覆盖相同断言的等价自动化测试。
+         若某项推迟的手动检查没有等价自动化测试，该行是真正的覆盖缺口 — 记录在 retrospective Misses 中并附上 follow-up 计划，不可静默推迟。
+         决策表使「推迟但已覆盖」vs「推迟且有缺口」在 archive 时可见，使 reviewer 可以审计完整性而无需从 plan + 测试文件重新推导理由。
+         自身非阻塞 — 即使有已识别缺口，只要它们被记录为 follow-up，Overall Decision 仍可为 PASS。仅在 §7 为空且 plan.md 有 `[~]` 行时阻塞（意味着缺口分析被跳过，而非缺口不存在）。
 
-         若 plan.md 有任何标记 `[~]` 推迟的任务（手动 smoke /
-         dogfood / 现场环境检查在本 cycle 中未运行），
-         在 verify.md §7 中逐项枚举并识别覆盖相同断言的
-         等价自动化测试。
-
-         若某项推迟的手动检查没有等价自动化测试，
-         该行是真正的覆盖缺口 — 记录在
-         retrospective Misses 中并附上 follow-up 计划，
-         不可静默推迟。
-
-         决策表使「推迟但已覆盖」vs「推迟且有缺口」在
-         archive 时可见，使 reviewer 可以审计完整性而无需
-         从 plan + 测试文件重新推导理由。
-
-         自身非阻塞 — 即使有已识别缺口，只要它们被记录为 follow-up，
-         Overall Decision 仍可为 PASS。
-         仅在 §7 为空且 plan.md 有 `[~]` 行时阻塞（意味着
-         缺口分析被跳过，而非缺口不存在）。
-
-      verify 可以多次重新运行——每次运行覆盖
-      verify.md 为当前状态。
-
-      若 `openspec-verify-change` skill 不可用，退而求其次
-      手动运行上方的编号检查并将结果记录在 verify.md。
+      verify 可以多次重新运行——每次运行覆盖 verify.md 为当前状态。
+      若 `openspec-verify-change` skill 不可用，退而求其次手动运行上方的编号检查并将结果记录在 verify.md。
     requires:
       - plan
 
@@ -290,49 +213,33 @@ artifacts:
     template: retrospective.md
     instruction: |
       PRECHECK — verify 完成证据：
-      产出 retrospective.md 前，运行以下命令。若任一
-      失败，STOP 并告知用户 verify 必须先通过。
+      产出 retrospective.md 前，运行以下命令。若任一失败，STOP 并告知用户 verify 必须先通过。
 
       1. verify.md 存在：
          test -f openspec/changes/<change-name>/verify.md
 
       2. verify.md 的 Overall Decision 未标记为 FAIL。
-         verify.md 模板在其「Overall Decision」部分有三个互斥复选框：
-         「✅ 通过」、「⚠️ 有警告通过」、「❌ 不通过」。
+         verify.md 模板在其「Overall Decision」部分有三个互斥复选框：「✅ 通过」、「⚠️ 有警告通过」、「❌ 不通过」。
          只有「❌ 不通过」被勾选时才阻塞：
          ! grep -q '^- \[x\] ❌ FAIL' openspec/changes/<change-name>/verify.md
 
       仅当两者都成功后，才可继续。
-
       写一份本变更的回顾，采用证据优先分析。
 
       重要时序说明：
-      - retrospective.md 在 apply 阶段完成且 verify.md 显示无阻塞问题后产出。
-        `requires: [verify]` 边仅用于 schema 图目的；
-        实际回顾必须在已完成的、已验证的实现上运行。
+      - retrospective.md 在 apply 阶段完成且 verify.md 显示无阻塞问题后产出。`requires: [verify]` 边仅用于 schema 图目的；实际回顾必须在已完成的、已验证的实现上运行。
 
-      流程（遵循以下 3 步）：
+      流程（遵循以下 4 步）：
 
       1. **收集证据**
-         - 在 change worktree 中运行 `git log --oneline <base>..HEAD`
-           （或若 worktree 已合并则在 main checkout 中）获取 commit 范围
-         - 阅读本 change 目录中的 brainstorm.md、plan.md、tasks.md
-           进行计划与实际对比
+         - 在 change worktree 中运行 `git log --oneline <base>..HEAD`（或若 worktree 已合并则在 main checkout 中）获取 commit 范围
+         - 阅读本 change 目录中的 brainstorm.md、plan.md、tasks.md 进行计划与实际对比
          - 若 verify.md 包含失败项目，在写 retro 前先解决它们
 
-      2. **写回顾章节** — 每个声明引用
-         commit hash、文件路径、测试名称或可衡量的事实。
+      2. **写回顾章节** — 每个声明引用 commit hash、文件路径、测试名称或可衡量的事实。
+         回顾有 §0 证据（量化前言）加 6 个分析章节（§1–§6）。下游分析条款引用 §0 而非在每行中内联 `[evidence: commit X]`。
 
-         回顾有 §0 证据（量化前言）加 6 个分析章节（§1–§6）。
-         下游分析条款引用 §0 而非在每行中内联
-         `[evidence: commit X]`。
-
-         §0) **证据** — 量化前言，从 `git log <base>..HEAD`、`tasks.md` 和
-             verify.md 填充：commit 数量、diff 大小（行/文件）、
-             任务完成比例、活跃小时数、subagent 派遣次数、
-             新增外部依赖、合并后 bug、archive 时
-             OpenSpec validate 状态、测试覆盖率信号，
-             以及单行 commit 链。
+         §0) **证据** — 量化前言，从 `git log <base>..HEAD`、`tasks.md` 和 verify.md 填充：commit 数量、diff 大小（行/文件）、任务完成比例、活跃小时数、subagent 派遣次数、新增外部依赖、合并后 bug、archive 时 OpenSpec validate 状态、测试覆盖率信号，以及单行 commit 链。
 
          §1) **成功之处** — 什么运作良好，附证据
 
@@ -343,82 +250,40 @@ artifacts:
 
          §3) **计划偏差** — 范围有变更的任务及其原因
 
-         §4) **Skill / 工作流合规性** — 列出本 schema apply
-             阶段的每个 skill；标记它是否被实际使用。
-             对任何 ✗，按下方规则填写
-             `### 主动跳过的 Skills` 小节。
+         §4) **Skill / 工作流合规性** — 列出本 schema apply 阶段的每个 skill；标记它是否被实际使用。对任何 ✗，按下方规则填写 `### 主动跳过的 Skills` 小节。
 
          §5) **意外之处** — 假设与实际不符的情况
 
-         §6) **待提升候选 → 长期学习** — 使用
-             `- [ ]` checklist（而非平面表格）。每个
-             candidate：
+         §6) **待提升候选 → 长期学习** — 使用 `- [ ]` checklist（而非平面表格）。每个 candidate：
+             - 带严重程度 emoji（🔴/🟡/📌）的标题 + 一句话 learning
+             - `→ **Promote to** <destination>`（memory / CLAUDE.md / schema / skill / one-off）
+             - 两行 body 与 feedback memory schema 对齐：`> **Why**: <reason>` 和 `> **How to apply**: <trigger condition>`
 
-             - 带严重程度 emoji（🔴/🟡/📌）的标题 +
-               一句话 learning
-             - `→ **Promote to** <destination>`（memory /
-               CLAUDE.md / schema / skill / one-off）
-             - 两行 body 与 feedback memory
-               schema 对齐：`> **Why**: <reason>` 和
-               `> **How to apply**: <trigger condition>`
-
-             未勾选的 `- [ ]` 项目表示进行中的
-             candidate，会带入下一个 cycle 的 retro
-             重新评估。checklist + Why/How body
-             格式使 candidate 可以机械地转移到
-             `~/.claude/memory/` 而无需重写。
+             未勾选的 `- [ ]` 项目表示进行中的 candidate，会带入下一个 cycle 的 retro 重新评估。checklist + Why/How body 格式使 candidate 可以机械地转移到 `~/.claude/memory/` 而无需重写。
 
          **跳过 skill 的规则（§4）**：
 
-         schema 设计明确意图：apply 阶段的 skill
-         都不应被跳过 — 每个 skill 进入流程都有原因。
-         默认预期：§4 每行都标记 ✓。
+         schema 设计明确意图：apply 阶段的 skill 都不应被跳过 — 每个 skill 进入流程都有原因。默认预期：§4 每行都标记 ✓。
 
-         对任何标记 ✗ 的 skill，不要只写一行原因。
-         相反，`### 主动跳过的 Skills`
-         小节必须为每个跳过的 skill 回答三个问题：
-
+         对任何标记 ✗ 的 skill，不要只写一行原因。相反，`### 主动跳过的 Skills` 小节必须为每个跳过的 skill 回答三个问题：
          - **跳过了什么**：具体的 skill 或 sub-step
-         - **为何本次 cycle**：触发跳过的具体 cycle 条件。
-           含糊理由（「不需要」「太小」「没时间」
-           「被外部 dep 挡住」「输出看起来不对」）不够 —
-           须命名实际 trigger（具体 commit hash、
-           log line 或观察到的行为）。
-         - **如何防止再发**：相同情况下
-           下一个 cycle 应依赖哪个 — schema graph fix /
-           skill description tightening / CLAUDE.md trigger /
-           scope-judgment rule / 明确的「one-off — schema boundary case」
-           （最后者须说明为何是 boundary，而非仅标注例外）。
+         - **为何本次 cycle**：触发跳过的具体 cycle 条件。含糊理由（「不需要」「太小」「没时间」「被外部 dep 挡住」「输出看起来不对」）不够 — 须命名实际 trigger（具体 commit hash、log line 或观察到的行为）。
+         - **如何防止再发**：相同情况下下一个 cycle 应依赖哪个 — schema graph fix / skill description tightening / CLAUDE.md trigger / scope-judgment rule / 明确的「one-off — schema boundary case」（最后者须说明为何是 boundary，而非仅标注例外）。
 
-         若多个 cycle 以相似的「如何防止再发」答案
-         跳过相同 skill，该模式是 §6 Promote
-         candidate（schema / skill PR 触发器）。
-         §4 小节是 schema 维护的反馈循环 —
-         它应使下一个 retro 的小节更短，而非更长。
+         若多个 cycle 以相似的「如何防止再发」答案跳过相同 skill，该模式是 §6 Promote candidate（schema / skill PR 触发器）。§4 小节是 schema 维护的反馈循环 — 它应使下一个 retro 的小节更短，而非越长。
 
-      3. **回顾跳过政策**（不同于 §4 skill 跳过 — 这是是否
-         写 retro 本身）：
+      3. **回顾跳过政策**：
+         - 平凡的单-commit 修复：可完全跳过回顾。在 retrospective.md 中写一行原因（如「Skipped: single-commit linter fix, no insights」）。
+         - 其他：产出 §0 证据加所有 6 个分析章节（若某节真的无内容，用「(none observed)」占位即可）。
 
-         - 平凡的单-commit 修复：可完全跳过
-           回顾。在 retrospective.md 中写一行原因
-           （如「Skipped: single-commit linter
-           fix, no insights」）。
-         - 其他：产出 §0 证据加所有 6 个分析
-           章节（若某节真的无内容，用「(none observed)」占位即可）。
+      4. **前向指针政策（事后事实有变更时）**：
 
-      4. **前向指针政策（事后事实有变更时）**
-
-         回顾反映写时的状态。若后续 cycles 发现
-         本 retro 中的声明、证据或结论有误/不完整：
-
+         回顾反映写时的状态。若后续 cycles 发现本 retro 中的声明、证据或结论有误/不完整：
          - 不要重写回顾（丢失审计轨迹）
-         - 在回顾本身中添加前向指针：
-           `> **Update YYYY-MM-DD**: 第 X 节已被
-           <follow-up retro / commit / issue 链接> 取代
+         - 在回顾本身中添加前向指针：`> **Update YYYY-MM-DD**: 第 X 节已被 <follow-up retro / commit / issue 链接> 取代
          - follow-up artifact 携带更正后的分析
 
-         原因：回顾是证据优先的 — 其价值在于
-         捕获特定时间点的已知和推理。重写它会移除该审计轨迹。
+         原因：回顾是证据优先的 — 其价值在于捕获特定时间点的已知和推理。重写它会移除该审计轨迹。
 
       使用模板结构将输出写到 retrospective.md。
     requires:
@@ -432,98 +297,48 @@ apply:
 
     0. **Pre-flight — 验证所需的 Superpowers skills**：
 
-       本 schema 的 apply 阶段需要以下 skills。
-       继续前确认每个都出现在你的可用 skills 列表中：
-
+       本 schema 的 apply 阶段需要以下 skills。继续前确认每个都出现在你的可用 skills 列表中：
        - superpowers:using-git-worktrees
-       - superpowers:subagent-driven-development
-         （传递地：superpowers:test-driven-development、
-                        superpowers:requesting-code-review）
+       - superpowers:subagent-driven-development（传递地：superpowers:test-driven-development、superpowers:requesting-code-review）
        - superpowers:finishing-a-development-branch
 
-       若任何必需的 skill 缺失，STOP 并告知用户 —
-       不要继续，也不要静默降级为手动实现。用户可以
-       安装 Superpowers 插件，或明确选择本指令
-       末尾描述的手动降级路径。
+       若任何必需的 skill 缺失，STOP 并告知用户 — 不要继续，也不要静默降级为手动实现。用户可以安装 Superpowers 插件，或明确选择本指令末尾描述的手动降级路径。
+       此外，确认项目的预期 CLI 工具在 PATH 上。确切列表取决于项目 — 阅读 plan.md 并浮现任何被提及的工具（如 `mvn`/`mvnw`、`docker`、`python3`、`jq`、`glab`/`gh`、`node`/`npm`）。若工具缺失，浮现为 WARNING（而非 STOP） — 用户可能有降级方案。在 apply 开始时打印缺失列表一次，使用户不会在 cycle 中途惊讶。
 
-       此外，确认项目的预期 CLI 工具在 PATH 上。
-       确切列表取决于项目 — 阅读 plan.md 并
-       浮现任何被提及的工具（如 `mvn`/`mvnw`、
-       `docker`、`python3`、`jq`、`glab`/`gh`、`node`/`npm`）。
-       若工具缺失，浮现为 WARNING（而非 STOP） —
-       用户可能有降级方案。在 apply 开始时打印缺失列表一次，
-       使用户不会在 cycle 中途惊讶。
-
-    1. **工作空间**：使用 Skill 工具调用
-       **superpowers:using-git-worktrees** 为本 change
-       创建隔离的 git worktree。
+    1. **工作空间**：使用 Skill 工具调用 **superpowers:using-git-worktrees** 为本 change 创建隔离的 git worktree。
 
     2. **执行器 — subagent-driven-development**：
 
-       使用 Skill 工具调用
-       **superpowers:subagent-driven-development** 执行
-       plan.md 微观任务，每个任务派遣新鲜 subagent。
+       使用 Skill 工具调用 **superpowers:subagent-driven-development** 执行 plan.md 微观任务，每个任务派遣新鲜 subagent。
 
        告知执行器：
        - 阅读本 change 目录中的 plan.md 获取微观任务
        - 粗粒度任务完成时更新 tasks.md 复选框
        - 在创建的 worktree 中工作
 
-       重要 — 传递 skill 激活：
-       subagent-driven-development 内部强制执行
-       以下 skills，所以你不需要手动调用它们：
-       - **superpowers:test-driven-development** — 每个任务
-         遵循 RED-GREEN-REFACTOR。写在失败测试之前的
-         实现代码会被删除。
-       - **superpowers:requesting-code-review** — 每个任务后
-         派遣一个 code-reviewer subagent 以捕获
-         spec 合规性和代码质量问题。在 apply
-         结束前对整个实现运行最终 review。
+       重要 — 传递 skill 激活：subagent-driven-development 内部强制执行以下 skills，所以你不需要手动调用它们：
+       - **superpowers:test-driven-development** — 每个任务遵循 RED-GREEN-REFACTOR。写在失败测试之前的实现代码会被删除。
+       - **superpowers:requesting-code-review** — 每个任务后派遣一个 code-reviewer subagent 以捕获 spec 合规性和代码质量问题。在 apply 结束前对整个实现运行最终 review。
 
-       本 schema 不支持 `superpowers:executing-plans`
-       作为非 subagent 平台的降级。其 SKILL.md 指出
-       executing-plans 不会传递激活 TDD 或
-       code-review — 使 Superpowers 带来的严谨性失效。
-       若平台缺少 subagent 支持，请使用内置的
-       `spec-driven` schema 而非本 schema。
+       本 schema 不支持 `superpowers:executing-plans` 作为非 subagent 平台的降级。其 SKILL.md 指出 executing-plans 不会传递激活 TDD 或 code-review — 使 Superpowers 带来的严谨性失效。若平台缺少 subagent 支持，请使用内置的 `spec-driven` schema 而非本 schema。
 
-    3. **验证**：所有任务完成后，通过调用
-       **openspec-verify-change** 产出 `verify` artifact
-       以检查完整性、正确性和一致性。
-       重新运行 verify 直到所有阻塞问题解决。
+    3. **验证**：所有任务完成后，通过调用 **openspec-verify-change** 产出 `verify` artifact 以检查完整性、正确性和一致性。重新运行 verify 直到所有阻塞问题解决。
 
     4. **回顾（趁上下文还热时写）**：
 
-       一旦 verify.md 显示无阻塞问题，在打开任何 PR 前
-       产出 `retrospective` artifact。运行
-       retrospective artifact 的指令（其自身有 PRECHECK
-       确认 verify.md 存在且不是 FAIL）。
-
-       为什么是现在而非之后：回顾是本 cycle 的交付物之一，
-       应该落在同一个 PR 中。在 PR 合并后写会产生
-       单独的尾部 commit 并丢失热上下文
-       （正在运行的测试、新的修复记忆）。
+       一旦 verify.md 显示无阻塞问题，在打开任何 PR 前产出 `retrospective` artifact。运行 retrospective artifact 的指令（其自身有 PRECHECK 确认 verify.md 存在且不是 FAIL）。
+       为什么是现在而非之后：回顾是本 cycle 的交付物之一，应该落在同一个 PR 中。在 PR 合并后写会产生单独的尾部 commit 并丢失热上下文（正在运行的测试、新的修复记忆）。
 
     5. **归档（同步 spec delta + 移动文件夹）**：
 
-       retrospective.md 写完后，运行 `openspec archive -y`
-       （或调用 `/opsx:archive`）。这会：
-       - 将 delta specs 从 `openspec/changes/<name>/specs/`
-         同步到 `openspec/specs/<capability>/spec.md`
-       - 将 change 文件夹移动到
-         `openspec/changes/archive/YYYY-MM-DD-<name>/`
+       retrospective.md 写完后，运行 `openspec archive -y`（或调用 `/opsx:archive`）。这会：
+       - 将 delta specs 从 `openspec/changes/<name>/specs/` 同步到 `openspec/specs/<capability>/spec.md`
+       - 将 change 文件夹移动到 `openspec/changes/archive/YYYY-MM-DD-<name>/`
 
-       archive 后 PR diff 包含完整的 cycle 状态：
-       所有 8 个 artifacts 完成，spec 同步到 main specs，
-       change 在 archive/ 下。
+       archive 后 PR diff 包含完整的 cycle 状态：所有 8 个 artifacts 完成，spec 同步到 main specs，change 在 archive/ 下。
 
     6. **完成（PR 是最后一步）**：
 
-       retrospective + archive 都完成后，使用 Skill
-       工具调用 **superpowers:finishing-a-development-branch**。
-
-       分支的 PR diff 必须包含完整的归档 cycle。
-       若不包含（如因 retrospective 或 archive
-       被跳过），STOP 并先完成那些。
-
+       retrospective + archive 都完成后，使用 Skill 工具调用 **superpowers:finishing-a-development-branch**。
+       分支的 PR diff 必须包含完整的归档 cycle。若不包含（如因 retrospective 或 archive 被跳过），STOP 并先完成那些。
        这是打开 PR 的规范顺序 — 不可调整顺序。
