@@ -7,7 +7,7 @@ description: >
   若平台不支持 subagent，请使用 spec-driven。
   每个 artifact / apply 步骤在使用前验证其必需的 skills，若有缺失则显示明确错误。
   流程：brainstorm → proposal → specs → tasks → plan → verify → retrospective。
-  design 为可选（从 brainstorm 产出，但 tasks 不依赖它）。
+  design 为必需（将 brainstorm 原始输出重组为结构化内容：Context / Goals / Decisions / Risks / Migration；tasks 和 plan 参考它作为实现指引）。
   Apply 阶段使用 git worktrees + subagent-driven-development（传递带来 TDD 和 code-review）。
 
 artifacts:
@@ -24,10 +24,9 @@ artifacts:
       使用 Skill 工具调用 **superpowers:brainstorming**。
 
       重要输出重定向：
-      - 不可写入 `docs/superpowers/specs/`。而是将 brainstorming 设计输出直接写入本 change 的 `brainstorm.md`。
-      - 若 brainstorming 产出了 design document，也写入本 change 的 `design.md`（这将预填充 design artifact）。
-
-      brainstorming 完成后，使用模板结构在 brainstorm.md 中总结已达成一致的设计。
+      - 不可写入 `docs/superpowers/specs/`。而是将 brainstorming 输出直接写入本 change 的 `brainstorm.md`。
+      - brainstorm.md 是**原始捕获** — 将 brainstorming skill 的完整输出按原样写入，不强制任何模板结构。该 skill 的自然输出通常是决策日志（背景 → 决策链 Q1-Qn → 设计方案权衡），但格式随对话而异。保留 skill 的自然组织形式。
+      - 不要在此步骤预填充 design.md。design.md 是一个独立的 artifact，将 brainstorm.md 内容重组为结构化章节（Context、Goals、Decisions、Risks、Migration）。该转换发生在 design 步骤。
 
       brainstorming skill 会：
       1. 探索项目上下文
@@ -67,14 +66,20 @@ artifacts:
     instruction: |
       创建说明如何实现本变更的设计文档。
 
-      检查 brainstorming 是否已产出 design.md 文件。
-      若 design.md 已存在且含 brainstorming 内容，则审查并完善，而非从头创建。
-      若 design.md 为空或不存在，从 brainstorm.md 输出创建。
+      以 brainstorm.md 作为输入。brainstorm.md 是 brainstorming skill
+      输出的原始捕获（通常是包含 Q1-Qn 决策、权衡和上下文的决策日志）。
+      你的工作是将这些内容**重组**为下方结构化章节。
+
+      这是转换，而非复制。提取并重组：
+      - 决策（来自 brainstorm 的 Q1-Qn）→ design.md §Decisions
+      - 背景/上下文 → design.md §Context
+      - 方案权衡 → design.md §Risks / Trade-offs
+      - 补充 Goals/Non-Goals 和 Migration Plan（可能需要从 brainstorm.md 内容推断）
 
       章节：
       - **Context**：背景、现状、约束、利益相关方
       - **Goals / Non-Goals**：本设计要达成什么、明确排除什么
-      - **Decisions**：关键技术选择及理由（为什么选 X 而非 Y？）。包括已考虑的替代方案。
+      - **Decisions**：关键技术选择及理由（为什么选 X 而非 Y？）。每项决策需包含已考虑的替代方案。
       - **Risks / Trade-offs**：已知局限、可能出问题的地方。格式：[风险] → 缓解措施
       - **Migration Plan**：部署步骤、回滚策略（如适用）
       - **Open Questions**：待解决的悬而未决的决策或未知
@@ -126,9 +131,10 @@ artifacts:
       - 任务应小到可以在一个会话中完成
       - 按依赖排序（什么必须先做？）
 
-      参考 specs 了解需要构建什么。若存在 design.md，参考它了解如何构建 — 但 design 是可选的（见 openspec-conventions：design.md 仅用于需要解释非平凡技术决策的变更）。
+      参考 specs 了解需要构建什么，参考 design.md 了解如何构建（架构决策、权衡、迁移方案）。
     requires:
       - specs
+      - design
 
   - id: plan
     generates: plan.md

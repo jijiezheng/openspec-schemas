@@ -2,6 +2,11 @@
 
 [English](./README.md) · [繁體中文](./README.zh-TW.md)
 
+[![Schema Structure](https://github.com/JiangWay/openspec-schemas/actions/workflows/validate-schemas.yml/badge.svg?branch=main)](https://github.com/JiangWay/openspec-schemas/actions/workflows/validate-schemas.yml)
+[![Upstream Drift](https://img.shields.io/github/issues-search/JiangWay/openspec-schemas?query=is%3Aopen%20label%3Aupstream-version-check&label=Upstream%20Drift&color=yellow)](https://github.com/JiangWay/openspec-schemas/issues?q=is%3Aopen+label%3Aupstream-version-check)
+[![OpenSpec baseline](https://img.shields.io/badge/OpenSpec_baseline-1.3.1-0277bd)](#相容性)
+[![Superpowers baseline](https://img.shields.io/badge/Superpowers_baseline-v5.1.0-0277bd)](#相容性)
+
 > 把 [OpenSpec](https://github.com/Fission-AI/OpenSpec) 的 artifact 治理流程(**做什麼**)與 [obra/superpowers](https://github.com/obra/superpowers) 的執行技能(**怎麼做**)整合為單一工作流。額外提供 evidence-first 的 `retrospective` artifact,補上 Superpowers 沒有的 retro 能力。
 >
 > 整合**完全發生在 prompt 層**——不修改 Superpowers 任何程式碼,不修改 OpenSpec CLI。Schema 版本:v1。
@@ -193,10 +198,9 @@ OpenSpec 管 **「做什麼」**(artifact 生命週期:proposal / specs / tasks 
 ### Artifact DAG
 
 ```text
-brainstorm ──→ proposal ──→ specs ──→ tasks ──→ plan ──→ [apply] ──→ verify ──→ retrospective
-                  │                     ↑
-                  └──→ design ──────────┘
-                       (optional)
+brainstorm ──┬──→ proposal ──→ specs ──┐
+             │                         ├──→ tasks ──→ plan ──→ [apply] ──→ verify ──→ retrospective
+             └──→ design ──────────────┘
 ```
 
 與 `spec-driven` 的差異:
@@ -222,17 +226,17 @@ flowchart TD
         direction TB
         BS["<b>brainstorm.md</b><br/><i>superpowers:brainstorming</i>"]
         PROP["<b>proposal.md</b>"]
-        DES["<b>design.md</b><br/><i>(可選,off critical path)</i>"]
+        DES["<b>design.md</b><br/><i>(必填,結構化決策)</i>"]
         SP["<b>specs/**/*.md</b>"]
         TK["<b>tasks.md</b>"]
         PL["<b>plan.md</b><br/><i>superpowers:writing-plans</i>"]
 
         BS --> PROP
-        BS -. 可選 .-> DES
+        BS --> DES
         PROP --> SP
         SP --> TK
+        DES --> TK
         TK --> PL
-        DES -. 參考 .-> TK
         DES -. 參考 .-> PL
     end
 
@@ -255,12 +259,10 @@ flowchart TD
     PL ==>|apply.requires: plan| A0
 
     classDef artifact fill:#e1f5ff,stroke:#0277bd,color:#000
-    classDef optional fill:#fff3e0,stroke:#e65100,stroke-dasharray:5,color:#000
     classDef step fill:#f3e5f5,stroke:#6a1b9a,color:#000
     classDef capstone fill:#e8f5e9,stroke:#2e7d32,color:#000
 
-    class BS,PROP,SP,TK,PL artifact
-    class DES optional
+    class BS,PROP,DES,SP,TK,PL artifact
     class A0,A1,A2,A3,A4,A5 step
     class A6 capstone
 ```
@@ -269,8 +271,9 @@ ASCII 簡圖(CLI 可讀):
 
 ```text
 PLANNING ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  brainstorm.md ──┬─→ proposal.md ──→ specs/**/*.md ──→ tasks.md ──→ plan.md
-                  └─→ design.md(可選,給 tasks/plan 參考)
+  brainstorm.md ──┬─→ proposal.md ──→ specs/**/*.md ──┐
+                  │                                   ├─→ tasks.md ──→ plan.md
+                  └─→ design.md(必填)────────────────┘
                                                                        │
                           apply.requires: [plan], apply.tracks: tasks  ▼
 APPLY ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -310,7 +313,7 @@ APPLY ━━━━━━━━━━━━━━━━━━━━━━━━�
 
 Superpowers skill 有預設輸出路徑(例如 brainstorming 寫到 `docs/superpowers/specs/`)。本 schema 的 artifact instruction **覆寫**這個行為,透過 prompt 上下文注入,把產出重導到 change 目錄:
 
-- brainstorming → `openspec/changes/<name>/brainstorm.md`(可選 `design.md`)
+- brainstorming → `openspec/changes/<name>/brainstorm.md`
 - writing-plans → `openspec/changes/<name>/plan.md`
 
 純粹透過 invocation-time 上下文注入實現,不修改 skill 源碼。
@@ -333,7 +336,7 @@ Superpowers skill 有預設輸出路徑(例如 brainstorming 寫到 `docs/superp
 /opsx:new my-feature --schema superpowers-bridge
 /opsx:continue         # → brainstorm(互動式對話)
 /opsx:continue         # → proposal
-/opsx:continue         # → design(optional,僅在需要解釋技術決策時)
+/opsx:continue         # → design(將 brainstorm 重組為結構化決策)
 /opsx:continue         # → specs
 /opsx:continue         # → tasks
 /opsx:continue         # → plan
@@ -460,22 +463,44 @@ LLM 不必解讀 timing 文字 —— 跑指令、看結果即可。這是顧慮
 
 ---
 
+## 版本識別
+
+本 bundle 帶**兩組版本號**,意義不同,不要混淆:
+
+| 標識 | 位置 | 含義 | 範例 |
+|---|---|---|---|
+| Schema major | `schema.yaml: version: 1` | schema graph 契約版本(artifacts、`requires:` 邊、PRECHECK 形狀)。破壞性改動才 bump | `1` |
+| Bundle release | `VERSION` 檔 + git tag | 此 bundle 的 SemVer 發佈版本,從屬於某個 schema major | `1.0.0`(tag `v1.0.0`) |
+
+`1.x.y` 是 schema major `v1` 的一個 published cut;未來 schema major `v2` 會把 bundle release 重新從 `2.0.0` 起算。Adopter 釘到 `v1.x.y` 即享有 schema graph 在 v1 major 內的相容保證。
+
+> 下方相容矩陣以 `v1`(schema major)為列鍵,因為 OpenSpec / Superpowers 的相容性由 schema 契約決定,不受 bundle 內部 patch 影響。
+
 ## 相容性
 
-下表記錄通過驗證的 upstream 版本。CI 會每週重跑驗證(見 [version-check workflow](../.github/workflows/version-check.yml))。
+本 schema 撰寫時所對齊的 upstream 基準版本。這是**歷史快照,不是端對端相容性承諾** — CI 無法在 headless 環境跑完整的 prompt-layer workflow,行為相容性依賴 drift 觸發人類檢核。
 
-| superpowers-bridge | OpenSpec CLI | Superpowers plugin | 最後驗證 |
+目前 bundle release: **`1.0.0`**(git tag `v1.0.0`;見 [VERSION](./VERSION))。
+
+| superpowers-bridge | OpenSpec CLI | Superpowers plugin | 基準日期 |
 |---|---|---|---|
-| v1 | `1.3.1` | `v5.1.0` | 2026-05-06 |
+| v1 | `1.3.1` | `v5.1.0` | 2026-05-11 |
+
+### 驗證機制
+
+契約分三層 — **基準聲明 + 自動 drift 偵測 + 人類檢核** — 不是自動相容性 enforcement。
+
+| 層級 | 機制 | 抓什麼 | 觸發時機 |
+|---|---|---|---|
+| 結構性 | [`validate-schemas.yml`](../.github/workflows/validate-schemas.yml) 每次 push/PR;[`version-check.yml`](../.github/workflows/version-check.yml) 每週對 latest OpenSpec 跑 | schema graph 結構性破壞(欄位改名、`requires:` 邊移除、PRECHECK 語法變動) | CI run 變紅 |
+| Drift 通知 | [`version-check.yml`](../.github/workflows/version-check.yml) 每週,把基準 vs 最新 npm / GitHub release 字串比對 | Pinned ≠ latest upstream | 開 / 更新 [labelled drift issue](https://github.com/JiangWay/openspec-schemas/issues?q=is%3Aopen+label%3Aupstream-version-check),由人類檢核(workflow 維持綠 — drift 是正常狀態,不是錯誤) |
+| 端對端 workflow | **未自動化** | Superpowers skill 內部行為改變(改名、改寫 prose 影響 PRECHECK 語意、傳遞依賴變動);OpenSpec 引擎語意微調 | drift issue 觸發時,人類讀 upstream release notes |
+
+「基準日期」由 maintainer 手動重跑完整 cycle 確認沒退步後才推進。在那之前,日期代表的是人類聲明,不是自動測試通過。
 
 ### Known breaking changes
 
 目前尚無。未來 schema graph 結構性變動(artifact 增刪、`requires:` edge 變動、PRECHECK 變動)會記錄在這裡並附 migration note。
-
-### 哪些會自動偵測、哪些不會
-
-- ✅ **會自動偵測** —— 結構性破壞(新版 OpenSpec CLI 讓 `openspec schema validate superpowers-bridge` 失敗)。[validate-schemas workflow](../.github/workflows/validate-schemas.yml) 在每次 push/PR 跑;[version-check workflow](../.github/workflows/version-check.yml) 每週對最新版本跑,矩陣落後或 validate 失敗就開 / 更新 issue。
-- ⚠️ **不會自動偵測** —— Superpowers skill 的行為變動(skill 改名、改寫 prose 而影響 PRECHECK 語意、傳遞依賴變動)。version-check workflow 偵測到新版時開 issue,提醒人類去讀 release notes。
 
 採用者:版本 pin 在表中之上即可。要查自己專案的 runtime 現況,跑 `openspec list` + `openspec schemas` + `claude plugin list`。
 

@@ -1,19 +1,49 @@
-## 背景
+## Context
 
-<!-- 背景与现状 -->
+<!--
+背景、现状、约束、利益相关方。
+brainstorm.md 记录了探索过程（替代方案 + 选定方向）；
+本文件承接选定方向，展开完整技术设计。
+-->
 
-## 目标 / 非目标
+## Goals / Non-Goals
 
-**目标：**
+**Goals:**
 <!-- 本设计旨在实现什么 -->
 
-**非目标：**
+**Non-Goals:**
 <!-- 明确不在范围内的事项 -->
 
-## 决策
+## Decisions
 
-<!-- 关键设计决策及理由 -->
+<!--
+所有技术决策的唯一来源（single source of truth）。
+brainstorm.md 的 Agreed Approach 记录了「选了哪条路」，
+本段记录「那条路上的每个岔口怎么选的」。
 
-## 风险 / 权衡
+每个决策建议结构：
+### D1：<决策标题>
+- **选择**：<采用的做法>
+- **理由**：<为何这样选>
+- **已考虑 alternative**：<被拒方案 + 拒绝原因>
+-->
 
-<!-- 已知的风险与权衡 -->
+## Risks / Trade-offs
+
+<!--
+Known risks and trade-offs.
+Format: [Risk] <描述> → Mitigation: <缓解措施>
+[Trade-off] <取舍描述> → 接受理由
+-->
+
+## Migration Plan
+
+<!--
+部署顺序、rollback 策略、验收条件。
+若本 change 不涉及部署变更（纯加套件、无 endpoint / DB 变更），
+可写「N/A — 本 change 不涉及部署变更」。
+-->
+
+## Open Questions
+
+<!-- 待解决的决策或未知事项 -->

@@ -2,6 +2,11 @@
 
 [English](./README.md) · [繁體中文](./README.zh-TW.md) · [简体中文](./README.zh-CN.md)
 
+[![Schema Structure](https://github.com/JiangWay/openspec-schemas/actions/workflows/validate-schemas.yml/badge.svg?branch=main)](https://github.com/JiangWay/openspec-schemas/actions/workflows/validate-schemas.yml)
+[![Upstream Drift](https://img.shields.io/github/issues-search/JiangWay/openspec-schemas?query=is%3Aopen%20label%3Aupstream-version-check&label=Upstream%20Drift&color=yellow)](https://github.com/JiangWay/openspec-schemas/issues?q=is%3Aopen+label%3Aupstream-version-check)
+[![OpenSpec baseline](https://img.shields.io/badge/OpenSpec_baseline-1.3.1-0277bd)](#兼容性)
+[![Superpowers baseline](https://img.shields.io/badge/Superpowers_baseline-v5.1.0-0277bd)](#兼容性)
+
 > 将 OpenSpec 的制品治理（**做什么**）与 [obra/superpowers](https://github.com/obra/superpowers) 执行技能（**怎么做**）桥接为单一工作流。增加了证据优先的 `retrospective` 制品，填补了 Superpowers 原生不覆盖的空白。
 >
 > 集成完全在 prompt 层实现——未修改 Superpowers 源码，未改动 OpenSpec CLI。Schema 版本：v1。
@@ -230,10 +235,9 @@ OpenSpec 治理**做什么**（制品生命周期：proposal / specs / tasks / v
 ### 制品 DAG
 
 ```text
-brainstorm ──→ proposal ──→ specs ──→ tasks ──→ plan ──→ [apply] ──→ verify ──→ retrospective
-                  │                     ↑
-                  └──→ design ──────────┘
-                       (optional)
+brainstorm ──┬──→ proposal ──→ specs ──┐
+             │                         ├──→ tasks ──→ plan ──→ [apply] ──→ verify ──→ retrospective
+             └──→ design ──────────────┘
 ```
 
 与 `spec-driven` 的区别：
@@ -259,17 +263,17 @@ flowchart TD
         direction TB
         BS["<b>brainstorm.md</b><br/><i>superpowers:brainstorming</i>"]
         PROP["<b>proposal.md</b>"]
-        DES["<b>design.md</b><br/><i>（可选，不在关键路径）</i>"]
+        DES["<b>design.md</b><br/><i>(必填,结构化决策)</i>"]
         SP["<b>specs/**/*.md</b>"]
         TK["<b>tasks.md</b>"]
         PL["<b>plan.md</b><br/><i>superpowers:writing-plans</i>"]
 
         BS --> PROP
-        BS -. optional .-> DES
+        BS --> DES
         PROP --> SP
         SP --> TK
+        DES --> TK
         TK --> PL
-        DES -. ref .-> TK
         DES -. ref .-> PL
     end
 
@@ -292,12 +296,10 @@ flowchart TD
     PL ==>|apply.requires: plan| A0
 
     classDef artifact fill:#e1f5ff,stroke:#0277bd,color:#000
-    classDef optional fill:#fff3e0,stroke:#e65100,stroke-dasharray:5,color:#000
     classDef step fill:#f3e5f5,stroke:#6a1b9a,color:#000
     classDef capstone fill:#e8f5e9,stroke:#2e7d32,color:#000
 
-    class BS,PROP,SP,TK,PL artifact
-    class DES optional
+    class BS,PROP,DES,SP,TK,PL artifact
     class A0,A1,A2,A3,A4,A5 step
     class A6 capstone
 ```
@@ -306,8 +308,9 @@ ASCII 版（CLI 可读）：
 
 ```text
 PLANNING ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  brainstorm.md ──┬─→ proposal.md ──→ specs/**/*.md ──→ tasks.md ──→ plan.md
-                  └─→ design.md (可选，作为 tasks/plan 的参考)
+  brainstorm.md ──┬─→ proposal.md ──→ specs/**/*.md ──┐
+                  │                                   ├─→ tasks.md ──→ plan.md
+                  └─→ design.md(必填)───────────────────┘
                                                                        │
                           apply.requires: [plan], apply.tracks: tasks  ▼
 APPLY ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -347,7 +350,7 @@ APPLY ━━━━━━━━━━━━━━━━━━━━━━━━�
 
 Superpowers 技能有默认输出路径（如 brainstorming 写入 `docs/superpowers/specs/`）。本 schema 的制品说明**通过注入上下文覆盖**该行为，将输出重定向到 change 目录：
 
-- brainstorming → `openspec/changes/<name>/brainstorm.md`（+ 可选 `design.md`）
+- brainstorming → `openspec/changes/<name>/brainstorm.md`
 - writing-plans → `openspec/changes/<name>/plan.md`
 
 通过调用时注入上下文实现，未修改技能源码。
@@ -360,7 +363,7 @@ Superpowers 技能有默认输出路径（如 brainstorming 写入 `docs/superpo
 ```bash
 /opsx:ff my-feature    # 一键：脚手架 + brainstorm + proposal + design + specs + tasks + plan
 /opsx:apply            # worktree + subagent-driven-development（含 TDD + code-review）
-/opsx:verify           # 产生 verify.md（5 项检查）
+/opsx:verify           # 产生 verify.md（7 项检查）
 /opsx:continue         # → retrospective（产生 retrospective.md，6 部分）
 /opsx:archive          # 归档
 ```
@@ -370,12 +373,12 @@ Superpowers 技能有默认输出路径（如 brainstorming 写入 `docs/superpo
 /opsx:new my-feature --schema superpowers-bridge
 /opsx:continue         # → brainstorm（交互式对话）
 /opsx:continue         # → proposal
-/opsx:continue         # → design（可选，仅在需要解释技术决策时）
+/opsx:continue         # → design（将 brainstorm 重组为结构化决策）
 /opsx:continue         # → specs
 /opsx:continue         # → tasks
 /opsx:continue         # → plan
 /opsx:apply            # → 实现 + worktree + subagent-driven-development
-/opsx:verify           # → verify.md（apply 后，运行 5 项检查）
+/opsx:verify           # → verify.md（apply 后，运行 7 项检查）
 /opsx:continue         # → retrospective.md（verify 后，证据优先 6 部分）
 /opsx:archive
 ```
@@ -497,24 +500,46 @@ LLM 无需解释时间文本——它运行命令并读取结果。这是关切�
 
 ---
 
+## 版本识别
+
+本 bundle 携带**两个不应混淆的版本标识**：
+
+| 标识符 | 位置 | 含义 | 示例 |
+|---|---|---|---|
+| Schema major | `schema.yaml: version: 1` | Schema 图的契约（artifacts、`requires:` 边、PRECHECK 形状）。重大变更时递增。 | `1` |
+| Bundle release | `VERSION` 文件 + git tag | 本 bundle 的 SemVer 发布，限定在一个 schema major 内。 | `1.0.0`（标记 `v1.0.0`） |
+
+Bundle release `1.x.y` 是 schema major `v1` 的某个已发布切面。未来的 schema major `v2` 将重新从 `2.0.0` 开始发布。锁定到 `v1.x.y` 的采用者可保证在 v1 major 内的 schema 图兼容性。
+
+> 下方的兼容性矩阵以 `v1`（schema major）为行键，因为与 OpenSpec / Superpowers 的兼容性由 schema 契约决定，而非本 bundle 内的补丁级编辑。
+
 ## 兼容性
 
-下表记录通过验证的 upstream 版本。CI 会每周重跑验证（见 [version-check workflow](../.github/workflows/version-check.yml)）。
+本 schema 起草时对照的基线版本。这是**历史快照，不是端到端兼容性保证**——CI 无法以无头模式运行完整的 prompt 层工作流，因此行为兼容性依赖于漂移触发时的人工审查。
 
-| superpowers-bridge | OpenSpec CLI | Superpowers plugin | 最后验证 |
+当前 bundle release：**`1.0.0`**（git tag `v1.0.0`；见 [VERSION](./VERSION)）。
+
+| superpowers-bridge | OpenSpec CLI | Superpowers plugin | 基线日期 |
 |---|---|---|---|
-| v1 | `1.3.1` | `v5.1.0` | 2026-05-06 |
+| v1 | `1.3.1` | `v5.1.0` | 2026-05-11 |
 
-### Known breaking changes
+### 检查方式
 
-目前尚无。未来 schema graph 结构性变动（artifact 增减、`requires:` edge 变动、PRECHECK 变动）会记录在这里并附 migration note。
+采用三层契约——**基线声明 + 自动化漂移检测 + 人工审查**——而非自动化兼容性强制。
 
-### 哪些会自动侦测、哪些不会
+| 层 | 机制 | 捕获对象 | 触发时机 |
+|---|---|---|---|
+| 结构性 | 每次 push/PR 执行 [`validate-schemas.yml`](../.github/workflows/validate-schemas.yml)；每周对最新 OpenSpec 执行 [`version-check.yml`](../.github/workflows/version-check.yml) | Schema 图破坏（字段重命名、`requires:` 边被移除、PRECHECK 语法变化） | CI 运行失败（红色） |
+| 漂移通知 | [`version-check.yml`](../.github/workflows/version-check.yml) 每周将上述基线与最新 npm / GitHub release 对比 | 固定版本 ≠ 最新上游 | 开/更新一个[带有标签的漂移 issue](https://github.com/JiangWay/openspec-schemas/issues?q=is%3Aopen+label%3Aupstream-version-check) 供人工审查（工作流保持绿色——漂移是常态，不是失败） |
+| 端到端工作流 | **未自动化** | Superpowers skill 内部行为变化（重命名、改变 PRECHECK 语义的 prose 改写、传递依赖变化）；OpenSpec 引擎的细微语义偏移 | 漂移 issue 触发时由人工阅读上游 release notes |
 
-- ✅ **会自动侦测** —— 结构性破坏（新版 OpenSpec CLI 让 `openspec schema validate superpowers-bridge` 失败）。[validate-schemas workflow](../.github/workflows/validate-schemas.yml) 在每次 push/PR 跑；[version-check workflow](../.github/workflows/version-check.yml) 每周对最新版本跑，矩阵落后或 validate 失败就开 / 更新 issue。
-- ⚠️ **不会自动侦测** —— Superpowers skill 的行为变动（skill 改名、改写 prose 而影响 PRECHECK 语义、传递依赖变动）。version-check workflow 侦测到新版时开 issue，提醒人类去读 release notes。
+"基线日期"在维护者手动针对列出版本完整跑一轮流程并确认未降级时更新。在此之前，该日期标记的是人工认证，而非自动化测试通过。
 
-采用者：版本 pin 在表中之上即可。要查自己项目的 runtime 现况，跑 `openspec list` + `openspec schemas` + `claude plugin list`。
+### 已知重大变化
+
+目前尚无。未来的 schema 图结构性变化（artifact 增减、`requires:` 边变化、PRECHECK 变化）将在此记录并附带迁移说明。
+
+对于采用者：固定版本 ≥ 上述列出的版本。要检查你自己项目中的运行时状态，运行 `openspec list` + `openspec schemas` + `claude plugin list`。
 
 ---
 
